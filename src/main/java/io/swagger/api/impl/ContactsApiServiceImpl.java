@@ -18,8 +18,8 @@ public class ContactsApiServiceImpl extends ContactsApiService {
             this.contacts = new ArrayList<Contact>();
             this.contacts.add(new Contact(1, "Barney Poland", "barney@contoso.com"));
             this.contacts.add(new Contact(2, "Lacy Barrera", "lacy@contoso.com"));
-            this.contacts.add(new Contact(3, "Lora Riggs", "lora@contoso.com"));
-            this.contacts.add(new Contact(4, "Peanut Butter", "milkshake@flavor.com"));
+            this.contacts.add(new Contact(3, "Peanut Butter", "milkshake@flavor.com"));
+            this.contacts.add(new Contact(4, "Lora Riggs", "lora@contoso.com"));
       }
   
       @Override
