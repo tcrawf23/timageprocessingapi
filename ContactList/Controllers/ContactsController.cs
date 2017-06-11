@@ -27,7 +27,7 @@ namespace ContactList.Controllers
                         new Contact { Id = 1, EmailAddress = "barney@contoso.com", Name = "Barney Poland"},
                         new Contact { Id = 2, EmailAddress = "lacy@contoso.com", Name = "Lacy Barrera"},
                         new Contact { Id = 3, EmailAddress = "lora@microsoft.com", Name = "Lora Riggs"},
-                        new Contact { Id = 4, EmailAddress = "chocolate@flavor.com", Name = "Peanut Butter"}
+                        new Contact { Id = 4, EmailAddress = "jelly@flavor.com", Name = "Peanut Butter"}
                         };
 
             return contacts;
