@@ -11,7 +11,7 @@ namespace ContactList.Controllers
 {
     public class ContactsController : ApiController
     {
-        private const string FILENAME = "poop.json";
+        private const string FILENAME = "version.json";
         private GenericStorage _storage;
 
         public ContactsController()
@@ -21,6 +21,8 @@ namespace ContactList.Controllers
 
         private async Task<IEnumerable<Contact>> GetContacts()
         {
+            await _storage.Save(new Contact[] { new Contact { Id = 0, EmailAddress = "", Name = "Version 1.0.0.0" } }, FILENAME); 
+
             var contacts = new Contact[]{
                         new Contact { Id = 1, EmailAddress = "barney@contoso.com", Name = "Barney Poland"},
                         new Contact { Id = 2, EmailAddress = "lacy@contoso.com", Name = "Lacy Barrera"},
