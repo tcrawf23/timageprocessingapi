@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\main",
+    "\\src\\main\\java",
+    "\\src\\main\\java\\io",
+    "\\src\\main\\java\\io\\swagger",
+    "\\src\\main\\java\\io\\swagger\\api",
+    "\\src\\main\\java\\io\\swagger\\api\\impl"
+  ],
+  "SelectedNode": "\\src\\main\\java\\io\\swagger\\api\\impl\\ContactsApiServiceImpl.java",
+  "PreviewInSolutionExplorer": false
+}
