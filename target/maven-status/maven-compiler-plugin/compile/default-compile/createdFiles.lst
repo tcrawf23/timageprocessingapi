@@ -1,0 +1,9 @@
+io\swagger\api\ApiResponseMessage.class
+io\swagger\api\ApiOriginFilter.class
+io\swagger\api\NotFoundException.class
+io\swagger\api\impl\ContactsApiServiceImpl.class
+io\swagger\api\ContactsApiService.class
+io\swagger\api\ApiException.class
+io\swagger\api\ContactsApi.class
+io\swagger\model\Contact.class
+io\swagger\api\factories\ContactsApiServiceFactory.class
