@@ -1,19 +1,11 @@
 package io.swagger.api.impl;
 
 import io.swagger.api.*;
-import io.swagger.model.*;
-
-import com.sun.jersey.multipart.FormDataParam;
 
 import io.swagger.model.Contact;
 
 import java.util.*;
 import io.swagger.api.NotFoundException;
-
-import java.io.InputStream;
-
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 import javax.ws.rs.core.Response;
 
@@ -27,6 +19,7 @@ public class ContactsApiServiceImpl extends ContactsApiService {
             this.contacts.add(new Contact(1, "Barney Poland", "barney@contoso.com"));
             this.contacts.add(new Contact(2, "Lacy Barrera", "lacy@contoso.com"));
             this.contacts.add(new Contact(3, "Lora Riggs", "lora@contoso.com"));
+            this.contacts.add(new Contact(4, "Peanut Butter", "milkshake@flavor.com"));
       }
   
       @Override
