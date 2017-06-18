@@ -43,10 +43,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swashbuckle.Core.5.2.2\lib\net40\Swashbuckle.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.IdentityModel.Tokens.Jwt">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.0\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -92,11 +88,8 @@
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\GenericStorage.cs" />
-    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="Global.asax.cs">

@@ -22,7 +22,6 @@ C:\Users\tcraw\timageprocessingapi\ContactList\bin\ContactList.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\ContactList.pdb
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\Microsoft.Web.Infrastructure.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\Newtonsoft.Json.dll
-C:\Users\tcraw\timageprocessingapi\ContactList\bin\Swashbuckle.Core.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\System.Net.Http.Formatting.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\System.Web.Http.dll
@@ -35,4 +34,3 @@ C:\Users\tcraw\timageprocessingapi\ContactList\bin\System.Web.Http.xml
 C:\Users\tcraw\timageprocessingapi\ContactList\bin\System.Web.Http.WebHost.xml
 C:\Users\tcraw\timageprocessingapi\ContactList\obj\Debug\ContactList.dll
 C:\Users\tcraw\timageprocessingapi\ContactList\obj\Debug\ContactList.pdb
-C:\Users\tcraw\timageprocessingapi\ContactList\obj\Debug\ContactList.csprojResolveAssemblyReference.cache
