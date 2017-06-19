@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Linq;
+using System.IO;
+using System.Net.Http;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace ContactList.Controllers
 {
@@ -42,5 +46,19 @@ namespace ContactList.Controllers
             }
             return backwards;
         }
+
+        /*public async Task<byte[]> Post()
+        {
+            byte[] fileData = await Request.Content.ReadAsByteArrayAsync();
+
+            if (fileData == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            //S3:Set Response contents and MediaTypeHeaderValue
+            HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
+            Response.Content = new ByteArrayContent(fileData);
+            Response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+            return fileData;
+        }*/
     }
 }
