@@ -35,7 +35,7 @@ namespace ContactList.Controllers
             return contacts.FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<string> Post()
+        /*public async Task<string> Post()
         {
             string forward = await Request.Content.ReadAsStringAsync();
 
@@ -45,9 +45,9 @@ namespace ContactList.Controllers
                 backwards += forward.Substring(i, 1);
             }
             return backwards;
-        }
+        }*/
 
-        /*public async Task<byte[]> Post()
+        public async Task<HttpResponseMessage> Post()
         {
             byte[] fileData = await Request.Content.ReadAsByteArrayAsync();
 
@@ -56,9 +56,9 @@ namespace ContactList.Controllers
             //S3:Set Response contents and MediaTypeHeaderValue
             HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
             Response.Content = new ByteArrayContent(fileData);
-            Response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            Response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
 
-            return fileData;
-        }*/
+            return Response;
+        }
     }
 }
