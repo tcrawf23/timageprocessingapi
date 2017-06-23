@@ -7,6 +7,9 @@ using System.IO;
 using System.Net.Http;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System;
 
 namespace ContactList.Controllers
 {
@@ -53,7 +56,29 @@ namespace ContactList.Controllers
 
             if (fileData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            //S3:Set Response contents and MediaTypeHeaderValue
+
+            Bitmap bitmap = new Bitmap(new MemoryStream(fileData));
+            System.Console.WriteLine(bitmap.Width + ":" + bitmap.Height);
+
+            //HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
+            //Response.Content = new StringContent(bitmap.Width + ":" + bitmap.Height);
+            //Response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
+
+            for (int y = 0; y < bitmap.Height; y ++)
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    //red 50%, green 30%, blue 20%
+                    Color color = bitmap.GetPixel(x, y);
+                    int val = (int) (color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
+                    bitmap.SetPixel(x, y, Color.FromArgb(color.A, val, val, val));
+                }
+            }
+
+            MemoryStream ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Jpeg);
+            fileData = ms.ToArray();
+
             HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
             Response.Content = new ByteArrayContent(fileData);
             Response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
