@@ -57,26 +57,56 @@ namespace ContactList.Controllers
             if (fileData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            Bitmap bitmap = new Bitmap(new MemoryStream(fileData));
-            System.Console.WriteLine(bitmap.Width + ":" + bitmap.Height);
+            Bitmap original = new Bitmap(new MemoryStream(fileData));
 
             //HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
             //Response.Content = new StringContent(bitmap.Width + ":" + bitmap.Height);
             //Response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
 
-            for (int y = 0; y < bitmap.Height; y ++)
+            /*for (int y = 0; y < bitmap.Height; y ++)
             {
                 for (int x = 0; x < bitmap.Width; x++)
                 {
-                    //red 50%, green 30%, blue 20%
+                    //red 30%, green 59%, blue 11%
                     Color color = bitmap.GetPixel(x, y);
                     int val = (int) (color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
                     bitmap.SetPixel(x, y, Color.FromArgb(color.A, val, val, val));
                 }
-            }
+            }*/
+
+            //create a blank bitmap the same size as original
+            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
+
+            //get a graphics object from the new image
+            Graphics g = Graphics.FromImage(newBitmap);
+
+            //create the grayscale ColorMatrix
+            ColorMatrix colorMatrix = new ColorMatrix(
+            new float[][]
+            {
+                new float[] {.3f, .3f, .3f, 0, 0},
+                new float[] {.59f, .59f, .59f, 0, 0},
+                new float[] {.11f, .11f, .11f, 0, 0},
+                new float[] {0, 0, 0, 1, 0},
+                new float[] {0, 0, 0, 0, 1}
+            });
+
+            //create some image attributes
+            ImageAttributes attributes = new ImageAttributes();
+
+            //set the color matrix attribute
+            attributes.SetColorMatrix(colorMatrix);
+
+            //draw the original image on the new image
+            //using the grayscale color matrix
+            g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
+            0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+
+            //dispose the Graphics object
+            g.Dispose();
 
             MemoryStream ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Jpeg);
+            newBitmap.Save(ms, ImageFormat.Jpeg);
             fileData = ms.ToArray();
 
             HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
