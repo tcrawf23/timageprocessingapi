@@ -38,18 +38,6 @@ namespace ContactList.Controllers
             return contacts.FirstOrDefault(x => x.Id == id);
         }
 
-        /*public async Task<string> Post()
-        {
-            string forward = await Request.Content.ReadAsStringAsync();
-
-            var backwards = "";
-            for (int i = forward.Length - 1; i >= 0; i--)
-            {
-                backwards += forward.Substring(i, 1);
-            }
-            return backwards;
-        }*/
-
         public async Task<HttpResponseMessage> Post()
         {
             byte[] fileData = await Request.Content.ReadAsByteArrayAsync();
@@ -57,56 +45,13 @@ namespace ContactList.Controllers
             if (fileData == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            Bitmap original = new Bitmap(new MemoryStream(fileData));
+            Bitmap bitmap = new Bitmap(new MemoryStream(fileData));
 
-            //HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
-            //Response.Content = new StringContent(bitmap.Width + ":" + bitmap.Height);
-            //Response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/plain");
-
-            /*for (int y = 0; y < bitmap.Height; y ++)
-            {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    //red 30%, green 59%, blue 11%
-                    Color color = bitmap.GetPixel(x, y);
-                    int val = (int) (color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
-                    bitmap.SetPixel(x, y, Color.FromArgb(color.A, val, val, val));
-                }
-            }*/
-
-            //create a blank bitmap the same size as original
-            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
-
-            //get a graphics object from the new image
-            Graphics g = Graphics.FromImage(newBitmap);
-
-            //create the grayscale ColorMatrix
-            ColorMatrix colorMatrix = new ColorMatrix(
-            new float[][]
-            {
-                new float[] {.3f, .3f, .3f, 0, 0},
-                new float[] {.59f, .59f, .59f, 0, 0},
-                new float[] {.11f, .11f, .11f, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
-            });
-
-            //create some image attributes
-            ImageAttributes attributes = new ImageAttributes();
-
-            //set the color matrix attribute
-            attributes.SetColorMatrix(colorMatrix);
-
-            //draw the original image on the new image
-            //using the grayscale color matrix
-            g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
-            0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-
-            //dispose the Graphics object
-            g.Dispose();
+            int numClusters = 8;
+            Cluster(ref bitmap, numClusters);
 
             MemoryStream ms = new MemoryStream();
-            newBitmap.Save(ms, ImageFormat.Jpeg);
+            bitmap.Save(ms, ImageFormat.Jpeg);
             fileData = ms.ToArray();
 
             HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -114,6 +59,150 @@ namespace ContactList.Controllers
             Response.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
 
             return Response;
+        }
+
+        public static void Cluster(ref Bitmap original, int numClusters)
+        {
+            bool changed = true; bool success = true;
+            double[,] means = new double[numClusters, 3];
+            int[] clustering = InitClustering(original.Width * original.Height, numClusters, 0);
+            int maxCount = 100;
+            int ct = 0;
+            while (changed == true && success == true && ct < maxCount)
+            {
+                ++ct;
+                success = UpdateMeans(original, clustering, ref means);
+                changed = UpdateClustering(original, ref clustering, means);
+            }
+            Color[] newColors = new Color[means.GetLength(0)];
+            for (int k = 0; k < means.GetLength(0); ++k)
+            {
+                if (means[k, 0] != -1)
+                {
+                    newColors[k] = Color.FromArgb((int)means[k, 0], (int)means[k, 1], (int)means[k, 2]);
+                }
+            }
+            
+            for (int i = 0; i < original.Height; ++i)
+            {
+                for (int j = 0; j < original.Width; ++j)
+                {
+                    original.SetPixel(j, i, newColors[clustering[(i * original.Width) + j]]);
+                }
+            }
+        }
+
+        private static int[] InitClustering(int length, int numClusters, int seed)
+        {
+            //Random random = new Random(seed);
+            Random random = new Random();
+            int[] clustering = new int[length];
+            for (int i = 0; i < numClusters; ++i)
+                clustering[i] = i;
+            for (int i = numClusters; i < clustering.Length; ++i)
+                clustering[i] = random.Next(0, numClusters);
+            return clustering;
+        }
+
+        private static bool UpdateMeans(Bitmap data, int[] clustering, ref double[,] means)
+        {
+            bool success = true;
+            int numClusters = means.GetLength(0);
+            int[] clusterCounts = new int[numClusters];
+
+            for (int k = 0; k < means.GetLength(0); ++k)
+            {
+                means[k, 0] = 0.0;
+                means[k, 1] = 0.0;
+                means[k, 2] = 0.0;
+            }
+
+            for (int i = 0; i < data.Height; ++i)
+            {
+                for (int j = 0; j < data.Width; ++j)
+                {
+                    int cluster = clustering[(i * data.Width) + j];
+                    ++clusterCounts[cluster];
+                    Color pixel = data.GetPixel(j, i);
+                    means[cluster, 0] += pixel.R; // accumulate sum
+                    means[cluster, 1] += pixel.G;
+                    means[cluster, 2] += pixel.B;
+                }
+            }
+
+            for (int k = 0; k < means.GetLength(0); ++k)
+            {
+                if (clusterCounts[k] != 0)
+                {
+                    means[k, 0] /= clusterCounts[k];
+                    means[k, 1] /= clusterCounts[k];
+                    means[k, 2] /= clusterCounts[k];
+                }
+                else
+                {
+                    means[k, 0] = -1;
+                }
+            }
+
+            return success;
+        }
+
+        private static bool UpdateClustering(Bitmap data, ref int[] clustering, double[,] means)
+        {
+            int numClusters = means.GetLength(0);
+            bool changed = false;
+
+            int[] newClustering = new int[clustering.Length];
+            Array.Copy(clustering, newClustering, clustering.Length);
+
+            double[] distances = new double[numClusters];
+
+            for (int i = 0; i < data.Height; ++i)
+            {
+                for (int j = 0; j < data.Width; ++j)
+                {
+                    for (int k = 0; k < numClusters; ++k)
+                        distances[k] = Distance(data.GetPixel(j, i), means, k);
+
+                    int newClusterID = MinIndex(distances);
+                    if (newClusterID != newClustering[(i * data.Width) + j])
+                    {
+                        changed = true;
+                        newClustering[(i * data.Width) + j] = newClusterID;
+                    }
+                }
+            }
+
+            Array.Copy(newClustering, clustering, newClustering.Length);
+            return changed; // at least one change
+        }
+
+        private static double Distance(Color pixel, double[,] means, int cluster)
+        {
+            if (means[cluster, 0] == -1)
+            {
+                return -1;
+            }
+            double sumSquaredDiffs = 0.0;
+            sumSquaredDiffs += Math.Pow(pixel.R - means[cluster, 0], 2);
+            sumSquaredDiffs += Math.Pow(pixel.G - means[cluster, 1], 2);
+            sumSquaredDiffs += Math.Pow(pixel.B - means[cluster, 2], 2);
+            return Math.Sqrt(sumSquaredDiffs);
+        }
+
+        private static int MinIndex(double[] distances)
+        {
+            int indexOfMin = 0;
+            double smallDist = distances[0];
+            for (int k = 0; k < distances.Length; ++k)
+            {
+                if (distances[k] < smallDist && distances[k] != -1)
+                {
+                    smallDist = distances[k];
+                    indexOfMin = k;
+                }
+            }
+            return indexOfMin;
         }
     }
 }
