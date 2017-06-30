@@ -38,7 +38,7 @@ namespace ContactList.Controllers
             return contacts.FirstOrDefault(x => x.Id == id);
         }
 
-        public async Task<HttpResponseMessage> Post()
+        public async Task<HttpResponseMessage> Post([FromUri] int numClusters)
         {
             byte[] fileData = await Request.Content.ReadAsByteArrayAsync();
 
@@ -47,7 +47,7 @@ namespace ContactList.Controllers
 
             Bitmap bitmap = new Bitmap(new MemoryStream(fileData));
 
-            int numClusters = 8;
+            //int numClusters = 2;
             Cluster(ref bitmap, numClusters);
 
             MemoryStream ms = new MemoryStream();
@@ -65,7 +65,7 @@ namespace ContactList.Controllers
         {
             bool changed = true; bool success = true;
             double[,] means = new double[numClusters, 3];
-            int[] clustering = InitClustering(original.Width * original.Height, numClusters, 0);
+            int[] clustering = InitClustering(original.Width * original.Height, numClusters);
             int maxCount = 100;
             int ct = 0;
             while (changed == true && success == true && ct < maxCount)
@@ -92,9 +92,8 @@ namespace ContactList.Controllers
             }
         }
 
-        private static int[] InitClustering(int length, int numClusters, int seed)
+        private static int[] InitClustering(int length, int numClusters)
         {
-            //Random random = new Random(seed);
             Random random = new Random();
             int[] clustering = new int[length];
             for (int i = 0; i < numClusters; ++i)
@@ -112,9 +111,12 @@ namespace ContactList.Controllers
 
             for (int k = 0; k < means.GetLength(0); ++k)
             {
-                means[k, 0] = 0.0;
-                means[k, 1] = 0.0;
-                means[k, 2] = 0.0;
+                if (means[k, 0] != -1)
+                {
+                    means[k, 0] = 0.0;
+                    means[k, 1] = 0.0;
+                    means[k, 2] = 0.0;
+                }
             }
 
             for (int i = 0; i < data.Height; ++i)
@@ -141,6 +143,8 @@ namespace ContactList.Controllers
                 else
                 {
                     means[k, 0] = -1;
+                    means[k, 1] = 0;
+                    means[k, 2] = 0;
                 }
             }
 
@@ -165,6 +169,10 @@ namespace ContactList.Controllers
                         distances[k] = Distance(data.GetPixel(j, i), means, k);
 
                     int newClusterID = MinIndex(distances);
+                    if (newClusterID == -1) //if no clusters, something went wrong
+                    {
+                        return false;
+                    }
                     if (newClusterID != newClustering[(i * data.Width) + j])
                     {
                         changed = true;
@@ -187,13 +195,14 @@ namespace ContactList.Controllers
             sumSquaredDiffs += Math.Pow(pixel.R - means[cluster, 0], 2);
             sumSquaredDiffs += Math.Pow(pixel.G - means[cluster, 1], 2);
             sumSquaredDiffs += Math.Pow(pixel.B - means[cluster, 2], 2);
-            return Math.Sqrt(sumSquaredDiffs);
+            return sumSquaredDiffs;
         }
 
         private static int MinIndex(double[] distances)
         {
-            int indexOfMin = 0;
-            double smallDist = distances[0];
+            int indexOfMin = -1;
+            double smallDist = 250000;
+
             for (int k = 0; k < distances.Length; ++k)
             {
                 if (distances[k] < smallDist && distances[k] != -1)
